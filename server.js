@@ -4,7 +4,8 @@ var express = require('express'),
     env = process.env,
     recentPosted = null,
     app = express();
-var socketio = require("socket.io");
+var server = require('http').Server(app);
+var io = require("socket.io")(server);
 
 app.use(express.static(__dirname + '/public' + '/'));
 app.use(express.static(__dirname + '/public' + '/js'));
@@ -34,3 +35,17 @@ router.route('/api').get(function(req, res) {
 app.use('/', router);
 app.listen('3000', 'localhost');
 console.log("ok");
+
+io.on('connection', function(socket) { // Incoming connections from clients
+    // Greet the newcomer
+    socket.emit('hello', {
+        greeting: 'Hi socket ' + socket.id + ' this is Server speaking! Let\'s play ping-pong. You pass!'
+    });
+
+    socket.on('ping', function(data) { // ping-event from the client to be respond with pong
+        console.log("received ping from client: ", data);
+        socket.emit('pong', {
+            id: data.id
+        });
+    });
+});

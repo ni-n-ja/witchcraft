@@ -6,6 +6,7 @@
         "express": "*",
         "body-parser": "",
         "socket.io": "*",
+	"http":"*",
         "gulp-nodemon":"",
         "gulp-livereload":"",
         "browser-sync":""
