@@ -1,0 +1,82 @@
+var gulp = require('gulp');
+var nodemon = require('gulp-nodemon');
+var browserSync = require('browser-sync');
+
+function reload() {
+  //browserSync.reload({ stream: false });
+  browserSync.reload();
+};
+
+gulp.task('browsersync', function() {
+  browserSync.init({
+    files: ['html/**/*.*', 'js/**/*.*'], // BrowserSyncにまかせるファイル群
+    proxy: 'localhost:3000',  // express の動作するポートにプロキシ
+    port: 4000,  // BrowserSync は 4000 番ポートで起動
+    open: true
+  });
+});
+
+gulp.task('serve', ['browsersync'], function () {
+  nodemon({
+    script: 'js/server.js',
+    ext: 'js html css',
+    ignore: [  // nodemon で監視しないディレクトリ
+      'node_modules',
+      'bin',
+      'views',
+      'public',
+      'test'
+    ],
+    env: {
+      'NODE_ENV': 'development'
+    },
+    stdout: false  // Express の再起動時のログを監視するため
+  }).on('readable', function() {
+  this.stdout.on('data', function(chunk) {
+  if (/^ok/.test(chunk)) {
+        // Express の再起動が完了したら、reload() でBrowserSync に通知。
+        // ※Express で出力する起動時のメッセージに合わせて比較文字列は修正
+        reload();
+      }
+      process.stdout.write(chunk);
+    });
+    this.stderr.on('data', function(chunk) {
+      process.stderr.write(chunk);
+    });
+  });
+});
+
+gulp.task('default', ['serve']);
+
+var gulp = require('gulp');
+var nodemon = require('gulp-nodemon');
+var browsersync = require('browser-sync');
+
+gulp.task('browser',['nodemon'],function() {//事前のnodemonによるサーバー再起動を完了させる
+    browsersync.init(null,{
+        proxy: 'http://ip:port',//ポート番号はbin/wwwに記載のポートに合わせる
+        port: '4000',           //ここで指定したポート番号でbrowser-syncを起動
+	files: ['html/**/*.*', 'js/**/*.*'],
+	open: true
+    });
+});
+
+gulp.task('nodemon',function(cd) {
+    var start = false;
+    return nodemon({
+        script: 'js/server.js',//実行スクリプトの指定　ここで注意する点が...
+        ext : 'js css html ejs',
+	ignore: [  // nodemon で監視しないディレクトリ
+	      'node_modules']
+        env: {
+            NODE_ENV: 'development'
+        }
+    }).on('start',function() {
+        if(!start) {
+            cd();
+            start = true;
+        }
+    });
+});
+
+gulp.task('default',['browser']);

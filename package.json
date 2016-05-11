@@ -1,0 +1,13 @@
+{
+    "scripts": {
+        "start": "node ./bin/www"
+    },
+    "dependencies": {
+        "express": "*",
+        "body-parser": "",
+        "socket.io": "*",
+        "gulp-nodemon":"",
+        "gulp-livereload":"",
+        "browser-sync":""
+    }
+}
